@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Age {
+  FILHOTE
+  ADULTO
+  SENIOR
+}
+
+enum Autonomy {
+  BAIXO
+  MEDIO
+  ALTO
+}
+
+enum Specie {
+  CACHORRO
+  GATO
+  PASSARO
+}
+
+model Pet {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  age         Age
+  autonomy    Autonomy
+  energy      String   @db.Char(1)
+  species     Specie
+  race        String
+
+  org   Org    @relation(fields: [orgId], references: [id])
+  orgId String @map("org_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("pets")
+}
+
+model Org {
+  id        String    @id @default(uuid())
+  name      String
+  alias     String?
+  cnpj      String    @unique
+  password  String
+  phone     String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  Pet       Pet[]
+  Address   Address[]
+
+  @@map("orgs")
+}
+
+model Address {
+  id         String    @id @default(uuid())
+  location   Location  @relation(fields: [locationId], references: [id])
+  locationId String    @map("location_id")
+  Org        Org       @relation(fields: [orgId], references: [id])
+  orgId      String    @map("org_id")
+  number     String?
+  complement String?
+  latitude   Decimal
+  longitude  Decimal
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  @@map("addresses")
+}
+
+model Location {
+  id           String    @id @default(uuid())
+  address      String
+  neighborhood String
+  city         String
+  zipcode      String    @unique @db.Char(8)
+  state        String    @db.Char(2)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+  Adresses     Address[]
+
+  @@map("locations")
+}

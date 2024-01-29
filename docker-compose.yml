@@ -1,0 +1,11 @@
+version: '3.1'
+services:
+  db:
+    container_name: find_a_friend
+    image: postgres
+    environment:
+      - POSTGRES_DB=findafriend
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - 5000:5432
